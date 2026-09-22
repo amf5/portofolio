@@ -36,6 +36,7 @@ const Footer = () => {
 
       if (response.status === 200) {
         setUserData(response.data);
+        console.log('User Portfolio Data:', response.data);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -59,7 +60,10 @@ const Footer = () => {
     setSending(true);
 
     try {
-      await emailjs.send(
+      console.log('Sending message...');
+      console.log('Form Data:', formData);
+
+      const response = await emailjs.send(
         'YOUR_SERVICE_ID',
         'YOUR_TEMPLATE_ID',
         {
@@ -70,6 +74,8 @@ const Footer = () => {
         'YOUR_PUBLIC_KEY'
       );
 
+      console.log('EmailJS Success:', response);
+
       toast.success('Message sent successfully!');
 
       setFormData({
@@ -78,10 +84,15 @@ const Footer = () => {
         message: '',
       });
     } catch (error) {
-      console.error('EmailJS Error:', error);
+      console.error('EmailJS Error FULL:', error);
+      console.error('EmailJS Status:', error?.status);
+      console.error('EmailJS Text:', error?.text);
+      console.error('EmailJS Message:', error?.message);
 
       toast.error(
-        'Failed to send message. Please try again.'
+        error?.text ||
+          error?.message ||
+          'Failed to send message. Please try again.'
       );
     } finally {
       setSending(false);
@@ -273,8 +284,8 @@ const Footer = () => {
                 onChange={handleChange}
                 placeholder="Your Message"
                 required
-                disabled={sending}
                 rows="3"
+                disabled={sending}
                 className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all resize-none disabled:opacity-50"
               />
 
