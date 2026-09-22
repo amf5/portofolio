@@ -42,22 +42,20 @@ const About = () => {
     setLoading(true);
 
     try {
-      // Fetch portfolio user
       const userResponse = await getUserPortfolio();
 
       console.log('About - User Data:', userResponse);
 
-      if (userResponse.status === 200) {
+      if (userResponse?.status === 200) {
         setPortfolioUser(userResponse.data);
       }
 
-      // Fetch projects
       const projectsResponse = await getAllProjects(1, 100);
 
       console.log('About - Projects Data:', projectsResponse);
 
-      if (projectsResponse.status === 200) {
-        setProjects(projectsResponse.data.projects || []);
+      if (projectsResponse?.status === 200) {
+        setProjects(projectsResponse.data?.projects || []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -83,12 +81,7 @@ const About = () => {
     );
   }
 
-  // Projects count
   const projectsCount = projects.length;
-
-  // ==========================================
-  // Social Links
-  // ==========================================
 
   const socialLinks = [
     {
@@ -136,11 +129,6 @@ const About = () => {
   const activeSocialLinks = socialLinks.filter(
     (link) => link.url
   );
-
-  // ==========================================
-  // Technical Skills
-  // From API
-  // ==========================================
 
   const techSkillsFromAPI = displayUser?.skills || [];
 
@@ -200,17 +188,15 @@ const About = () => {
   const techSkills =
     techSkillsFromAPI.length > 0
       ? techSkillsFromAPI.map((skill) => ({
-          name: skill,
+          name:
+            typeof skill === 'string'
+              ? skill
+              : skill?.name || 'Skill',
           icon: '💻',
           color:
             'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800',
         }))
       : defaultTechSkills;
-
-  // ==========================================
-  // Soft Skills
-  // Static - Not From API
-  // ==========================================
 
   const softSkills = [
     'Problem Solving',
@@ -228,54 +214,46 @@ const About = () => {
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
-
         <div className="text-center mb-12 animate-fade-in">
-
           <h1 className="text-4xl font-bold gradient-text">
             {displayUser?.name
               ? `About ${displayUser.name}`
               : 'About Me'}
           </h1>
 
-          <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mt-4"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mt-4" />
 
           <p className="text-gray-500 mt-4">
             {displayUser?.job ||
               'Backend Developer | Event-Driven Systems | Problem Solver'}
           </p>
-
         </div>
 
         {/* Main Card */}
-
         <div className="bg-white rounded-2xl shadow-xl p-8 animate-slide-up">
 
           <div className="flex flex-col md:flex-row gap-8">
 
             {/* Avatar */}
-
             <div className="flex-shrink-0">
-
               <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-6xl text-white shadow-xl overflow-hidden">
 
-                {displayUser.image ? (
+                {displayUser?.image ? (
                   <img
                     src={displayUser.image}
-                    alt={displayUser.name}
+                    alt={displayUser.name || 'Profile'}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  displayUser.name?.charAt(0).toUpperCase() || (
+                  displayUser?.name?.charAt(0).toUpperCase() || (
                     <FiUser />
                   )
                 )}
 
               </div>
-
             </div>
 
             {/* User Information */}
-
             <div className="flex-1">
 
               <h2 className="text-2xl font-bold text-gray-900">
@@ -283,7 +261,6 @@ const About = () => {
               </h2>
 
               {/* Job */}
-
               {displayUser.job && (
                 <p className="text-blue-600 font-medium flex items-center gap-2 mt-1">
                   <FiBriefcase />
@@ -292,7 +269,6 @@ const About = () => {
               )}
 
               {/* Location */}
-
               {displayUser.location && (
                 <p className="text-gray-500 text-sm flex items-center gap-2 mt-1">
                   <FiMapPin />
@@ -301,7 +277,6 @@ const About = () => {
               )}
 
               {/* Email */}
-
               {displayUser.email && (
                 <p className="text-gray-500 text-sm flex items-center gap-2 mt-1">
                   <FiMail />
@@ -310,7 +285,6 @@ const About = () => {
               )}
 
               {/* Bio */}
-
               {displayUser.bio && (
                 <p className="text-gray-600 mt-4">
                   {displayUser.bio}
@@ -318,41 +292,33 @@ const About = () => {
               )}
 
               {/* Tech Skills */}
-
               <div className="mt-6">
-
                 <h4 className="text-sm font-semibold text-gray-500 uppercase flex items-center gap-2">
                   <FiCode />
                   Tech Skills
                 </h4>
 
                 <div className="flex flex-wrap gap-2 mt-2">
-
-                  {techSkills.map((skill) => (
+                  {techSkills.map((skill, index) => (
                     <span
-                      key={skill.name}
+                      key={`${skill.name}-${index}`}
                       className={`${skill.color} px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1`}
                     >
                       <span>{skill.icon}</span>
                       {skill.name}
                     </span>
                   ))}
-
                 </div>
-
               </div>
 
               {/* Soft Skills */}
-
               <div className="mt-6">
-
                 <h4 className="text-sm font-semibold text-gray-500 uppercase flex items-center gap-2">
                   <FiAward />
                   Soft Skills
                 </h4>
 
                 <div className="flex flex-wrap gap-2 mt-2">
-
                   {softSkills.map((skill) => (
                     <span
                       key={skill}
@@ -361,13 +327,10 @@ const About = () => {
                       {skill}
                     </span>
                   ))}
-
                 </div>
-
               </div>
 
               {/* Social Links */}
-
               {activeSocialLinks.length > 0 && (
                 <div className="mt-6">
 
@@ -377,9 +340,7 @@ const About = () => {
                   </h4>
 
                   <div className="flex flex-wrap gap-3 mt-2">
-
                     {activeSocialLinks.map((link) => {
-
                       const Icon = link.icon;
 
                       return (
@@ -390,24 +351,21 @@ const About = () => {
                           rel="noopener noreferrer"
                           className={`p-2.5 ${link.color} text-white rounded-xl hover:opacity-90 transition-all hover:scale-110`}
                           title={link.label}
+                          aria-label={link.label}
                         >
                           <Icon size={20} />
                         </a>
                       );
-
                     })}
-
                   </div>
 
                 </div>
               )}
 
             </div>
-
           </div>
 
           {/* Projects Stats */}
-
           <div className="mt-8 pt-8 border-t border-gray-100">
 
             <div className="text-center">
@@ -429,19 +387,15 @@ const About = () => {
           </div>
 
           {/* Event-Driven MVC Section */}
-
           <div className="mt-8 pt-8 border-t border-gray-100">
 
             <div className="flex items-center gap-3 mb-4">
 
               <div className="p-3 bg-yellow-100 rounded-xl">
-
                 <FiZap className="text-yellow-600 text-2xl" />
-
               </div>
 
               <div>
-
                 <h3 className="text-lg font-bold text-gray-900">
                   Event-Driven MVC Architecture
                 </h3>
@@ -449,7 +403,6 @@ const About = () => {
                 <p className="text-sm text-gray-500">
                   Building Scalable, Reactive Systems
                 </p>
-
               </div>
 
             </div>
@@ -457,7 +410,6 @@ const About = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
               {/* Event-Driven */}
-
               <div className="bg-gray-50 rounded-xl p-4 border-l-4 border-yellow-500">
 
                 <div className="flex items-center gap-2 text-yellow-600 mb-2">
@@ -472,7 +424,6 @@ const About = () => {
               </div>
 
               {/* MVC */}
-
               <div className="bg-gray-50 rounded-xl p-4 border-l-4 border-blue-500">
 
                 <div className="flex items-center gap-2 text-blue-600 mb-2">
@@ -487,7 +438,6 @@ const About = () => {
               </div>
 
               {/* Event Sourcing */}
-
               <div className="bg-gray-50 rounded-xl p-4 border-l-4 border-purple-500">
 
                 <div className="flex items-center gap-2 text-purple-600 mb-2">
@@ -506,7 +456,6 @@ const About = () => {
           </div>
 
         </div>
-
       </div>
     </div>
   );
