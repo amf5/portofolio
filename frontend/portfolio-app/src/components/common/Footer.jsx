@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import emailjs from '@emailjs/browser';
+
 import {
   FiGithub,
   FiLinkedin,
@@ -12,11 +13,12 @@ import {
   FiPhone,
   FiArrowUp,
 } from 'react-icons/fi';
+
 import { getUserPortfolio } from '../../api/user';
 import { toast } from 'react-hot-toast';
 
 const Footer = () => {
-  const [userData, setUserData] = useState(null);
+  const [user, setUser] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -27,20 +29,18 @@ const Footer = () => {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    fetchUserData();
+    fetchUser();
   }, []);
 
-  const fetchUserData = async () => {
+  const fetchUser = async () => {
     try {
       const response = await getUserPortfolio();
 
-      console.log('User Portfolio Data:', response);
-
       if (response?.status === 200) {
-        setUserData(response.data);
+        setUser(response.data);
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching portfolio user:', error);
     }
   };
 
@@ -56,74 +56,49 @@ const Footer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (sending) return;
-
     if (!formData.name.trim()) {
-      toast.error('Please enter your name.');
+      toast.error('Please enter your name');
       return;
     }
 
     if (!formData.email.trim()) {
-      toast.error('Please enter your email.');
+      toast.error('Please enter your email');
       return;
     }
 
     if (!formData.message.trim()) {
-      toast.error('Please enter your message.');
+      toast.error('Please enter your message');
+      return;
+    }
+
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error('EmailJS environment variables are missing');
+
+      toast.error('Email service is not configured correctly');
+
       return;
     }
 
     setSending(true);
 
     try {
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-      console.log('========== EMAILJS DEBUG ==========');
-      console.log('Service ID:', serviceId);
-      console.log('Template ID:', templateId);
-      console.log(
-        'Public Key:',
-        publicKey ? `${publicKey.substring(0, 4)}****` : 'MISSING'
-      );
-      console.log('Form Data:', formData);
-      console.log('===================================');
-
-      if (!serviceId) {
-        throw new Error(
-          'VITE_EMAILJS_SERVICE_ID is missing.'
-        );
-      }
-
-      if (!templateId) {
-        throw new Error(
-          'VITE_EMAILJS_TEMPLATE_ID is missing.'
-        );
-      }
-
-      if (!publicKey) {
-        throw new Error(
-          'VITE_EMAILJS_PUBLIC_KEY is missing.'
-        );
-      }
-
       const response = await emailjs.send(
         serviceId,
         templateId,
         {
           name: formData.name,
           email: formData.email,
+          date: new Date().toLocaleString('en-EG'),
           message: formData.message,
         },
         publicKey
       );
 
-      console.log('========== EMAILJS SUCCESS ==========');
-      console.log('Response:', response);
-      console.log('Status:', response?.status);
-      console.log('Text:', response?.text);
-      console.log('=====================================');
+      console.log('EmailJS Success:', response);
 
       toast.success('Message sent successfully!');
 
@@ -145,7 +120,7 @@ const Footer = () => {
       toast.error(
         error?.text ||
           error?.message ||
-          'Failed to send message. Please try again.'
+          'Failed to send message'
       );
     } finally {
       setSending(false);
@@ -163,42 +138,26 @@ const Footer = () => {
     {
       key: 'github',
       icon: FiGithub,
-      url: userData?.github,
+      url: user?.github,
       label: 'GitHub',
-      color: 'hover:bg-gray-800',
     },
     {
       key: 'linkedin',
       icon: FiLinkedin,
-      url: userData?.linkedin,
+      url: user?.linkedin,
       label: 'LinkedIn',
-      color: 'hover:bg-blue-700',
     },
     {
       key: 'facebook',
       icon: FiFacebook,
-      url: userData?.facebook,
+      url: user?.facebook,
       label: 'Facebook',
-      color: 'hover:bg-blue-600',
     },
     {
       key: 'x',
       icon: FiTwitter,
-      url: userData?.x,
-      label: 'X',
-      color: 'hover:bg-gray-700',
-    },
-    {
-      key: 'whatsapp',
-      icon: FiPhone,
-      url: userData?.whatsapp
-        ? `https://wa.me/${userData.whatsapp.replace(
-            /[^0-9]/g,
-            ''
-          )}`
-        : null,
-      label: 'WhatsApp',
-      color: 'hover:bg-green-600',
+      url: user?.x,
+      label: 'X (Twitter)',
     },
   ];
 
@@ -207,185 +166,248 @@ const Footer = () => {
   );
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-gray-300">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer className="bg-gray-900 text-white mt-16">
 
-          {/* Column 1 */}
+      {/* Contact Section */}
+      <div className="container mx-auto px-4 py-12">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+          {/* Contact Information */}
           <div>
-            <h3 className="text-2xl font-bold gradient-text mb-4">
-              About
-            </h3>
 
-            <p className="text-sm text-gray-400 leading-relaxed">
-              {userData?.bio ||
-                'Building amazing experiences with code.'}
+            <h2 className="text-3xl font-bold mb-4">
+              Let's Work Together
+            </h2>
+
+            <p className="text-gray-400 leading-relaxed mb-8">
+              Have a project in mind or want to get in touch?
+              Send me a message and I'll get back to you as
+              soon as possible.
             </p>
 
-            {userData?.location && (
-              <p className="text-sm text-gray-400 mt-3 flex items-center gap-2">
-                <FiMapPin className="text-blue-500" />
-                {userData.location}
-              </p>
+            {/* Location */}
+            {user?.location && (
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gray-800 rounded-xl">
+                  <FiMapPin className="text-blue-400" />
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Location
+                  </p>
+
+                  <p className="text-gray-200">
+                    {user.location}
+                  </p>
+                </div>
+              </div>
             )}
 
-            {userData?.email && (
-              <p className="text-sm text-gray-400 mt-1 flex items-center gap-2">
-                <FiMail className="text-blue-500" />
-                {userData.email}
-              </p>
-            )}
-          </div>
+            {/* Email */}
+            {user?.email && (
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gray-800 rounded-xl">
+                  <FiMail className="text-blue-400" />
+                </div>
 
-          {/* Column 2 */}
-          <div>
-            <h3 className="text-2xl font-bold gradient-text mb-4">
-              Quick Links
-            </h3>
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Email
+                  </p>
 
-            <ul className="space-y-3 text-sm">
-              <li>
-                <a
-                  href="/"
-                  className="text-gray-400 hover:text-white transition-all hover:translate-x-2 inline-block"
-                >
-                  → Home
-                </a>
-              </li>
-
-              <li>
-                <a
-                  href="/portfolio"
-                  className="text-gray-400 hover:text-white transition-all hover:translate-x-2 inline-block"
-                >
-                  → Portfolio
-                </a>
-              </li>
-
-              <li>
-                <a
-                  href="/about"
-                  className="text-gray-400 hover:text-white transition-all hover:translate-x-2 inline-block"
-                >
-                  → About
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3 */}
-          <div>
-            <h3 className="text-2xl font-bold gradient-text mb-4">
-              Connect
-            </h3>
-
-            <div className="flex flex-wrap gap-3">
-              {activeSocialLinks.map((link) => {
-                const Icon = link.icon;
-
-                return (
                   <a
-                    key={link.key}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`p-3 bg-gray-800/50 rounded-xl ${link.color} transition-all hover:scale-110 hover:text-white backdrop-blur-sm`}
-                    title={link.label}
+                    href={`mailto:${user.email}`}
+                    className="text-gray-200 hover:text-blue-400 transition-colors"
                   >
-                    <Icon size={22} />
+                    {user.email}
                   </a>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
+
+            {/* Phone */}
+            {user?.phone && (
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gray-800 rounded-xl">
+                  <FiPhone className="text-blue-400" />
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Phone
+                  </p>
+
+                  <a
+                    href={`tel:${user.phone}`}
+                    className="text-gray-200 hover:text-blue-400 transition-colors"
+                  >
+                    {user.phone}
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Social Links */}
+            {activeSocialLinks.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-8">
+
+                {activeSocialLinks.map((link) => {
+                  const Icon = link.icon;
+
+                  return (
+                    <a
+                      key={link.key}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label}
+                      title={link.label}
+                      className="p-3 bg-gray-800 rounded-xl hover:bg-blue-600 transition-all hover:scale-110"
+                    >
+                      <Icon size={20} />
+                    </a>
+                  );
+                })}
+
+              </div>
+            )}
+
           </div>
 
-          {/* Column 4 */}
+          {/* Contact Form */}
           <div>
-            <h3 className="text-2xl font-bold gradient-text mb-4">
-              Send Message
+
+            <h3 className="text-2xl font-bold mb-6">
+              Send Me a Message
             </h3>
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-3"
+              className="space-y-5"
             >
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Your Name"
-                required
-                disabled={sending}
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
-              />
 
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Your Email"
-                required
-                disabled={sending}
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
-              />
+              {/* Name */}
+              <div>
+                <label
+                  htmlFor="footer-name"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Name
+                </label>
 
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Your Message"
-                required
-                rows="3"
-                disabled={sending}
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all resize-none disabled:opacity-50"
-              />
+                <input
+                  id="footer-name"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  disabled={sending}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60"
+                />
+              </div>
 
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="footer-email"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Email
+                </label>
+
+                <input
+                  id="footer-email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="your@email.com"
+                  disabled={sending}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60"
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <label
+                  htmlFor="footer-message"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Message
+                </label>
+
+                <textarea
+                  id="footer-message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Write your message..."
+                  disabled={sending}
+                  required
+                  rows={5}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-60"
+                />
+              </div>
+
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full btn-gradient py-3 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all"
               >
-                {sending ? (
-                  <>
-                    <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <FiSend />
-                    Send Message
-                  </>
-                )}
+                <FiSend />
+
+                {sending
+                  ? 'Sending...'
+                  : 'Send Message'}
               </button>
+
             </form>
+
           </div>
+
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Bottom Footer */}
+      <div className="border-t border-gray-800">
 
-            <p className="text-sm text-gray-500 flex items-center gap-1">
-              © {new Date().getFullYear()} Portfolio. Made with{' '}
-              <FiHeart className="text-red-500 animate-pulse" /> by{' '}
-              {userData?.name || 'Ahmed Walid'}
+        <div className="container mx-auto px-4 py-6">
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <p className="text-gray-500 text-sm text-center md:text-left">
+              © {new Date().getFullYear()}{' '}
+              {user?.name || 'Ahmed Walid'}.
+              All rights reserved.
+            </p>
+
+            <p className="text-gray-500 text-sm flex items-center gap-1">
+              Made with
+              <FiHeart className="text-red-500" />
+              using React
             </p>
 
             <button
               type="button"
               onClick={scrollToTop}
-              className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/30"
+              aria-label="Scroll to top"
+              className="p-3 bg-gray-800 rounded-xl hover:bg-blue-600 transition-all"
             >
-              <FiArrowUp size={20} />
+              <FiArrowUp size={18} />
             </button>
 
           </div>
+
         </div>
+
       </div>
+
     </footer>
   );
 };
