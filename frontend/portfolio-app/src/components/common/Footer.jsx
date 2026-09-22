@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import emailjs from '@emailjs/browser';
-
 import { getUserPortfolio } from '../../api/user';
 
 import {
@@ -17,6 +15,7 @@ import {
 } from 'react-icons/fi';
 
 import { toast } from 'react-hot-toast';
+import emailjs from '@emailjs/browser';
 
 const Footer = () => {
   const [userData, setUserData] = useState(null);
@@ -57,6 +56,8 @@ const Footer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (sending) return;
+
     if (!formData.name.trim()) {
       toast.error('Please enter your name');
       return;
@@ -96,14 +97,12 @@ const Footer = () => {
 
       console.log('EmailJS Template Params:', templateParams);
 
-      const response = await emailjs.send(
+      await emailjs.send(
         serviceId,
         templateId,
         templateParams,
         publicKey
       );
-
-      console.log('EmailJS Success:', response);
 
       toast.success('Message sent successfully!');
 
@@ -113,19 +112,12 @@ const Footer = () => {
         message: '',
       });
     } catch (error) {
-      console.error('========== EMAILJS ERROR ==========');
-      console.error('Full Error:', error);
-      console.error('Error Name:', error?.name);
-      console.error('Error Message:', error?.message);
-      console.error('Error Status:', error?.status);
-      console.error('Error Text:', error?.text);
-      console.error('Error Stack:', error?.stack);
-      console.error('===================================');
+      console.error('EmailJS Error:', error);
 
       toast.error(
         error?.text ||
           error?.message ||
-          'Failed to send message'
+          'Failed to send message. Please try again.'
       );
     } finally {
       setSending(false);
@@ -257,18 +249,22 @@ const Footer = () => {
             </h3>
 
             <div className="flex flex-wrap gap-3">
-              {activeSocialLinks.map((link) => (
-                <a
-                  key={link.key}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-3 bg-gray-800/50 rounded-xl ${link.color} transition-all hover:scale-110 hover:text-white backdrop-blur-sm`}
-                  title={link.label}
-                >
-                  <link.icon size={22} />
-                </a>
-              ))}
+              {activeSocialLinks.map((link) => {
+                const Icon = link.icon;
+
+                return (
+                  <a
+                    key={link.key}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`p-3 bg-gray-800/50 rounded-xl ${link.color} transition-all hover:scale-110 hover:text-white backdrop-blur-sm`}
+                    title={link.label}
+                  >
+                    <Icon size={22} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -289,7 +285,8 @@ const Footer = () => {
                 onChange={handleChange}
                 placeholder="Your Name"
                 required
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all"
+                disabled={sending}
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
               />
 
               <input
@@ -299,7 +296,8 @@ const Footer = () => {
                 onChange={handleChange}
                 placeholder="Your Email"
                 required
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all"
+                disabled={sending}
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
               />
 
               <textarea
@@ -308,14 +306,15 @@ const Footer = () => {
                 onChange={handleChange}
                 placeholder="Your Message"
                 required
+                disabled={sending}
                 rows="3"
-                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all resize-none"
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all resize-none disabled:opacity-50"
               />
 
               <button
                 type="submit"
                 disabled={sending}
-                className="w-full btn-gradient py-3 text-sm font-semibold flex items-center justify-center gap-2"
+                className="w-full btn-gradient py-3 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {sending ? (
                   <>
