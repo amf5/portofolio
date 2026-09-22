@@ -265,4 +265,129 @@ const Footer = () => {
               <li>
                 <a
                   href="/about"
-                  className="text-gray-400 hover:text-white transition
+                  className="text-gray-400 hover:text-white transition-all hover:translate-x-2 inline-block"
+                >
+                  → About
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3 */}
+          <div>
+            <h3 className="text-2xl font-bold gradient-text mb-4">
+              Connect
+            </h3>
+
+            <div className="flex flex-wrap gap-3">
+              {activeSocialLinks.map((link) => {
+                const Icon = link.icon;
+
+                return (
+                  <a
+                    key={link.key}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`p-3 bg-gray-800/50 rounded-xl ${link.color} transition-all hover:scale-110 hover:text-white backdrop-blur-sm`}
+                    title={link.label}
+                  >
+                    <Icon size={22} />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Column 4 */}
+          <div>
+            <h3 className="text-2xl font-bold gradient-text mb-4">
+              Send Message
+            </h3>
+
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-3"
+            >
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Your Name"
+                required
+                disabled={sending}
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
+              />
+
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Your Email"
+                required
+                disabled={sending}
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all disabled:opacity-50"
+              />
+
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="Your Message"
+                required
+                rows="3"
+                disabled={sending}
+                className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all resize-none disabled:opacity-50"
+              />
+
+              <button
+                type="submit"
+                disabled={sending}
+                className="w-full btn-gradient py-3 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {sending ? (
+                  <>
+                    <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <FiSend />
+                    Send Message
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-white/10">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <p className="text-sm text-gray-500 flex items-center gap-1">
+              © {new Date().getFullYear()} Portfolio. Made with{' '}
+              <FiHeart className="text-red-500 animate-pulse" /> by{' '}
+              {userData?.name || 'Ahmed Walid'}
+            </p>
+
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/30"
+            >
+              <FiArrowUp size={20} />
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
