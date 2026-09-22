@@ -78,7 +78,11 @@ const Footer = () => {
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
     if (!serviceId || !templateId || !publicKey) {
-      console.error('EmailJS environment variables are missing');
+      console.error('========== EMAILJS CONFIG ERROR ==========');
+      console.error('Service ID:', serviceId ? 'Loaded' : 'Missing');
+      console.error('Template ID:', templateId ? 'Loaded' : 'Missing');
+      console.error('Public Key:', publicKey ? 'Loaded' : 'Missing');
+      console.error('===========================================');
 
       toast.error('Email service is not configured correctly');
       return;
@@ -89,20 +93,31 @@ const Footer = () => {
     try {
       const templateParams = {
         title: 'New message from your portfolio',
-        from_name: formData.name,
-        from_email: formData.email,
+        from_name: formData.name.trim(),
+        from_email: formData.email.trim(),
         date: new Date().toLocaleString('en-EG'),
-        message: formData.message,
+        message: formData.message.trim(),
       };
 
-      console.log('EmailJS Template Params:', templateParams);
+      console.log('========== TEMPLATE PARAMS ==========');
+      console.log('title:', templateParams.title);
+      console.log('from_name:', templateParams.from_name);
+      console.log('from_email:', templateParams.from_email);
+      console.log('date:', templateParams.date);
+      console.log('message:', templateParams.message);
+      console.log('=====================================');
 
-      await emailjs.send(
+      const response = await emailjs.send(
         serviceId,
         templateId,
         templateParams,
         publicKey
       );
+
+      console.log('========== EMAILJS SUCCESS ==========');
+      console.log('Status:', response.status);
+      console.log('Text:', response.text);
+      console.log('=====================================');
 
       toast.success('Message sent successfully!');
 
@@ -112,7 +127,11 @@ const Footer = () => {
         message: '',
       });
     } catch (error) {
-      console.error('EmailJS Error:', error);
+      console.error('========== EMAILJS ERROR ==========');
+      console.error('Error:', error);
+      console.error('Status:', error?.status);
+      console.error('Text:', error?.text);
+      console.error('===================================');
 
       toast.error(
         error?.text ||
@@ -340,22 +359,4 @@ const Footer = () => {
 
             <p className="text-sm text-gray-500 flex items-center gap-1">
               © {new Date().getFullYear()} Portfolio. Made with{' '}
-              <FiHeart className="text-red-500 animate-pulse" /> by{' '}
-              {userData?.name || 'Ahmed Walid'}
-            </p>
-
-            <button
-              onClick={scrollToTop}
-              className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-500/30"
-            >
-              <FiArrowUp size={20} />
-            </button>
-
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-};
-
-export default Footer;
+              <
