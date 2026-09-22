@@ -36,6 +36,8 @@ const Footer = () => {
     try {
       const response = await getUserPortfolio();
 
+      console.log('Footer - User Data:', response);
+
       if (response?.status === 200) {
         setUser(response.data);
       }
@@ -75,6 +77,12 @@ const Footer = () => {
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+    console.log('EmailJS Config:', {
+      serviceId: serviceId ? 'Loaded' : 'Missing',
+      templateId: templateId ? 'Loaded' : 'Missing',
+      publicKey: publicKey ? 'Loaded' : 'Missing',
+    });
+
     if (!serviceId || !templateId || !publicKey) {
       console.error('EmailJS environment variables are missing');
 
@@ -86,15 +94,20 @@ const Footer = () => {
     setSending(true);
 
     try {
+      const templateParams = {
+        title: 'New message from your portfolio',
+        from_name: formData.name,
+        from_email: formData.email,
+        date: new Date().toLocaleString('en-EG'),
+        message: formData.message,
+      };
+
+      console.log('EmailJS Template Params:', templateParams);
+
       const response = await emailjs.send(
         serviceId,
         templateId,
-        {
-          name: formData.name,
-          email: formData.email,
-          date: new Date().toLocaleString('en-EG'),
-          message: formData.message,
-        },
+        templateParams,
         publicKey
       );
 
@@ -189,6 +202,7 @@ const Footer = () => {
             {/* Location */}
             {user?.location && (
               <div className="flex items-center gap-3 mb-4">
+
                 <div className="p-3 bg-gray-800 rounded-xl">
                   <FiMapPin className="text-blue-400" />
                 </div>
@@ -202,12 +216,14 @@ const Footer = () => {
                     {user.location}
                   </p>
                 </div>
+
               </div>
             )}
 
             {/* Email */}
             {user?.email && (
               <div className="flex items-center gap-3 mb-4">
+
                 <div className="p-3 bg-gray-800 rounded-xl">
                   <FiMail className="text-blue-400" />
                 </div>
@@ -224,12 +240,14 @@ const Footer = () => {
                     {user.email}
                   </a>
                 </div>
+
               </div>
             )}
 
             {/* Phone */}
             {user?.phone && (
               <div className="flex items-center gap-3 mb-4">
+
                 <div className="p-3 bg-gray-800 rounded-xl">
                   <FiPhone className="text-blue-400" />
                 </div>
@@ -246,6 +264,7 @@ const Footer = () => {
                     {user.phone}
                   </a>
                 </div>
+
               </div>
             )}
 
@@ -290,6 +309,7 @@ const Footer = () => {
 
               {/* Name */}
               <div>
+
                 <label
                   htmlFor="footer-name"
                   className="block text-sm font-medium text-gray-300 mb-2"
@@ -308,10 +328,12 @@ const Footer = () => {
                   required
                   className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60"
                 />
+
               </div>
 
               {/* Email */}
               <div>
+
                 <label
                   htmlFor="footer-email"
                   className="block text-sm font-medium text-gray-300 mb-2"
@@ -330,10 +352,12 @@ const Footer = () => {
                   required
                   className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60"
                 />
+
               </div>
 
               {/* Message */}
               <div>
+
                 <label
                   htmlFor="footer-message"
                   className="block text-sm font-medium text-gray-300 mb-2"
@@ -352,6 +376,7 @@ const Footer = () => {
                   rows={5}
                   className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-60"
                 />
+
               </div>
 
               {/* Submit */}
